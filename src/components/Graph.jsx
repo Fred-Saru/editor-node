@@ -3,6 +3,8 @@ import * as d3 from 'd3';
 
 import Circle from './shapes/Circle';
 import Node from './Node';
+import { connect } from 'react-redux';
+import { resetSelection as resetNodeSelection } from '../actions';
 
 class Graph extends React.Component {
     static defaultProps = {
@@ -30,7 +32,13 @@ class Graph extends React.Component {
                 } );
             } );
 
-        d3.select( this.view ).call( drag );
+        d3.select( this.view )
+            .call( drag )
+            .on( "click", () => {
+                this.props.resetNodeSelection()
+            } );
+
+
     }
 
     render() {
@@ -89,4 +97,10 @@ class Graph extends React.Component {
     }
 }
 
-export default Graph;
+const mapDispatchToProps = ( dispatch ) => {
+    return {
+        resetNodeSelection: () => dispatch( resetNodeSelection() )
+    }
+}
+
+export default connect( null, mapDispatchToProps )( Graph );

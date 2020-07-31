@@ -1,8 +1,6 @@
 import React from 'react';
 
-import Node from '../Node';
-
-class Circle extends Node {
+class Circle extends React.Component {
     static defaultProps = {
         gridSpacing: 36,
         gridDotSize: 2
