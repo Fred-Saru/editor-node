@@ -1,22 +1,24 @@
 import React from 'react';
 
 class Circle extends React.Component {
-    static defaultProps = {
-        gridSpacing: 36,
-        gridDotSize: 2
-    };
+  static defaultProps = {
+    x: 0,
+    y: 0,
+    size: 5
+  };
 
-    render() {
-        const { gridSpacing, gridDotSize } = this.props;
-        return (
-            <circle
-                className="circle"
-                cx={ ( gridSpacing || 0 ) / 2 }
-                cy={ ( gridSpacing || 0 ) / 2 }
-                r={ gridDotSize }>
-            </circle>
-        );
-    }
+  render() {
+    const { x, y, size, fill } = this.props;
+    return (
+      <circle
+        className="circle"
+        cx={x}
+        cy={y}
+        r={size}
+        fill={fill}>
+      </circle>
+    );
+  }
 }
 
 export default Circle;

@@ -3,63 +3,85 @@ import * as d3 from 'd3';
 import { connect } from 'react-redux';
 
 import { selectNode } from '../actions';
+import Connector from './shapes/Connector';
+import Circle from './shapes/Circle';
 
 class Node extends React.Component {
-    node;
+  node;
+  nodeWrapper;
 
-    constructor( props ) {
-        super( props );
-        this.state = {
-            x: 0,
-            y: 0
-        };
-    }
+  constructor( props ) {
+    super( props );
+    const { pos } = props.node.options;
+    this.state = {
+      dx: pos.x || 0,
+      dy: pos.y || 0
+    };
+  }
 
-    componentDidMount() {
+  componentDidMount() {
 
-        const drag = d3.drag()
-            .on( "drag", () => {
-                this.setState( {
-                    x: ( this.state.x ) + d3.event.dx,
-                    y: ( this.state.y ) + d3.event.dy,
-                } );
-            } );
+    const drag = d3.drag()
+      .on( "drag", () => {
+        this.setState( {
+          dx: this.state.dx + d3.event.dx,
+          dy: this.state.dy + d3.event.dy,
+        } );
+      } );
 
-        d3.select( this.node )
-            .call( drag )
-            .on( "click", () => {
-                d3.event.stopPropagation();
-                this.props.selectNode( { coucouc: 'asdiufasdiof' } );
-            } );
-    }
+    d3.select( this.nodeWrapper )
+      .call( drag );
 
-    render() {
-        const { x, y } = this.state;
+    d3.select( this.node )
+      .on( "click", () => {
+        d3.event.stopPropagation();
+        this.props.selectNode( this.props.node.id );
+      } );
+  }
 
-        return (
-            <g
-                className={ `node ${ this.props.selectedNode ? 'selected' : null }` }
-                ref={ el => this.node = el }
-                transform={ `translate(${ x }, ${ y })` }>
-                { this.props.children }
-            </g>
-        );
-    }
+  render() {
+    const { dx, dy } = this.state;
+
+    const { size } = this.props.node.options;
+
+    return (
+      <g
+        className='node-wrapper'
+        ref={el => this.nodeWrapper = el}
+        transform={`translate(${dx}, ${dy})`}
+      >
+        <g
+          className='connectors'>
+          <g className="connector">
+            <Connector x={size} />
+          </g>
+          <g className="connector">
+            <Connector x={-size} />
+          </g>
+        </g>
+        <g
+          ref={el => this.node = el}
+          className={`node ${this.props.selectedNode === this.props.node.id ? 'selected' : ''}`}>
+          <Circle size={size} />
+        </g>
+      </g>
+    );
+  }
 
 }
 
 const mapStateToProps = ( state ) => {
-    const { selectedNode } = state;
+  const { selectedNode } = state;
 
-    return {
-        selectedNode
-    };
+  return {
+    selectedNode
+  };
 }
 
 const mapDispatchToProps = ( dispatch ) => {
-    return {
-        selectNode: ( node ) => dispatch( selectNode( node ) )
-    };
+  return {
+    selectNode: ( node ) => dispatch( selectNode( node ) )
+  };
 };
 
 export default connect( mapStateToProps, mapDispatchToProps )( Node );
