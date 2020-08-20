@@ -1,4 +1,4 @@
-import { NODE_SELECT, RESET_NODE_SELECT, FETCH_NODES, ADD_NODE } from './actionTypes';
+import { NODE_SELECT, NODE_HOVER, FETCH_NODES, ADD_NODE, FETCH_EDGES, MOVE_NODE, ADD_EDGE } from './actionTypes';
 
 export const getNodes = () => {
   return {
@@ -12,6 +12,26 @@ export const addNode = () => {
   };
 };
 
+export const moveNode = ( payload ) => {
+  return {
+    type: MOVE_NODE,
+    payload
+  };
+};
+
+export const getEdges = () => {
+  return {
+    type: FETCH_EDGES
+  };
+};
+
+export const addEdge = ( source, target ) => {
+  return {
+    type: ADD_EDGE,
+    payload: { source, target }
+  };
+};
+
 export const selectNode = node => {
   return {
     type: NODE_SELECT,
@@ -19,8 +39,9 @@ export const selectNode = node => {
   };
 };
 
-export const resetSelection = () => {
+export const hoverNode = node => {
   return {
-    type: RESET_NODE_SELECT
+    type: NODE_HOVER,
+    payload: node
   };
 };

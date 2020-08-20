@@ -2,8 +2,9 @@ import React from 'react';
 import * as d3 from 'd3';
 
 import Node from './Node';
+import Edge from './Edge';
 import { connect } from 'react-redux';
-import { resetSelection as resetNodeSelection, getNodes, addNode } from '../actions';
+import { getNodes, addNode, getEdges, selectNode } from '../actions';
 
 class Graph extends React.Component {
   static defaultProps = {
@@ -25,6 +26,7 @@ class Graph extends React.Component {
   componentDidMount() {
 
     this.props.getNodes();
+    this.props.getEdges();
 
     const drag = d3.drag()
       .on( "drag", () => {
@@ -83,7 +85,17 @@ class Graph extends React.Component {
               ></rect>
               <g className="entities">
                 {
-                  this.props.nodes.map( node => {
+                  this.props.edges.allIds.map( key => {
+                    const edge = this.props.edges[key];
+                    return (
+                      <Edge edge={edge} key={edge.id}>
+                      </Edge>
+                    );
+                  } )
+                }
+                {
+                  this.props.nodes.allIds.map( key => {
+                    const node = this.props.nodes[key];
                     return (
                       <Node node={node} key={node.id}>
                       </Node>
@@ -104,15 +116,17 @@ class Graph extends React.Component {
 
 const mapDispatchToProps = ( dispatch ) => {
   return {
-    resetNodeSelection: () => dispatch( resetNodeSelection() ),
+    resetNodeSelection: () => dispatch( selectNode( null ) ),
     getNodes: () => dispatch( getNodes() ),
+    getEdges: () => dispatch( getEdges() ),
     addNode: () => dispatch( addNode() ),
   };
 }
 
-const mapStateToProps = ( { nodes } ) => {
+const mapStateToProps = ( { nodes, edges } ) => {
   return {
-    nodes
+    nodes,
+    edges
   };
 }
 

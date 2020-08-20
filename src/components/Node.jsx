@@ -2,66 +2,122 @@ import React from 'react';
 import * as d3 from 'd3';
 import { connect } from 'react-redux';
 
-import { selectNode } from '../actions';
-import Connector from './shapes/Connector';
+import { selectNode, moveNode, hoverNode, addEdge } from '../actions';
 import Circle from './shapes/Circle';
+import Line from './shapes/Line';
 
 class Node extends React.Component {
   node;
-  nodeWrapper;
 
-  constructor( props ) {
-    super( props );
-    const { pos } = props.node.options;
-    this.state = {
-      dx: pos.x || 0,
-      dy: pos.y || 0
-    };
-  }
+  state = {
+    source: null,
+    target: null,
+    isDrawingEdge: false,
+    mousePos: null
+  };
 
   componentDidMount() {
 
     const drag = d3.drag()
+      .on( "start", () => {
+        if ( d3.event.sourceEvent.shiftKey ) {
+          this.setState( {
+            source: this.props.node.id,
+            isDrawingEdge: true,
+          } );
+        }
+      } )
       .on( "drag", () => {
-        this.setState( {
-          dx: this.state.dx + d3.event.dx,
-          dy: this.state.dy + d3.event.dy,
-        } );
+
+        if ( this.state.isDrawingEdge ) {
+          const { x, y } = d3.event;
+          this.setState( {
+            mousePos: { x, y }
+          } );
+          return;
+        }
+
+        const { id, options } = this.props.node;
+        const { pos } = options;
+        const newPos = { x: pos.x + d3.event.dx, y: pos.y + d3.event.dy };
+
+        this.props.moveNode( id, newPos );
+
+      } )
+      .on( "end", () => {
+        // If we are not drawing a new edge we don't care
+        if ( !this.state.isDrawingEdge ) return;
+
+        const target = this.props.hoveredNode;
+        const { source } = this.state;
+
+        if ( target == null ) {
+          this.resetEdgeDrawing();
+          return;
+        }
+
+        this.props.addEdge( source, target );
+        this.resetEdgeDrawing();
       } );
 
-    d3.select( this.nodeWrapper )
+    d3.select( this.node )
       .call( drag );
 
     d3.select( this.node )
       .on( "click", () => {
         d3.event.stopPropagation();
-        this.props.selectNode( this.props.node.id );
+        const { id } = this.props.node;
+        this.props.selectNode( id );
       } );
   }
 
-  render() {
-    const { dx, dy } = this.state;
+  resetEdgeDrawing = () => {
+    this.setState( {
+      source: null,
+      isDrawingEdge: false,
+      mousePos: null
+    } );
+  }
 
-    const { size } = this.props.node.options;
+  handleMouseOver = () => {
+
+    //if ( this.state.isDrawingEdge ) return;
+
+    const { id } = this.props.node;
+    this.props.hoverNode( id );
+    console.log( "Enter: " + id );
+  }
+
+  handleMouseOut = () => {
+
+    //if ( this.state.isDrawingEdge ) return;
+
+    this.props.hoverNode( null );
+    const { id } = this.props.node;
+    console.log( "Leave: " + id );
+  }
+
+  renderEdge = () => {
+    if ( !this.state.isDrawingEdge
+      || !this.state.mousePos ) return null;
+
+    const { pos } = this.props.node.options;
+    return ( <Line start={pos} end={this.state.mousePos} /> );
+  }
+
+  render() {
+    const { pos, size } = this.props.node.options;
 
     return (
       <g
         className='node-wrapper'
-        ref={el => this.nodeWrapper = el}
-        transform={`translate(${dx}, ${dy})`}
-      >
-        <g
-          className='connectors'>
-          <g className="connector">
-            <Connector x={size} />
-          </g>
-          <g className="connector">
-            <Connector x={-size} />
-          </g>
-        </g>
+        onMouseOver={( e ) => this.handleMouseOver( e )}
+        onMouseOut={this.handleMouseOut}>
+        {this.renderEdge()}
         <g
           ref={el => this.node = el}
-          className={`node ${this.props.selectedNode === this.props.node.id ? 'selected' : ''}`}>
+          transform={`translate(${pos.x}, ${pos.y})`}
+          className={`node ${this.props.selectedNodeId === this.props.node.id ? 'selected' : ''}`}>
           <Circle size={size} />
         </g>
       </g>
@@ -71,16 +127,20 @@ class Node extends React.Component {
 }
 
 const mapStateToProps = ( state ) => {
-  const { selectedNode } = state;
+  const { selectedNode, hoveredNode } = state;
 
   return {
-    selectedNode
+    selectedNodeId: selectedNode,
+    hoveredNode: hoveredNode
   };
 }
 
 const mapDispatchToProps = ( dispatch ) => {
   return {
-    selectNode: ( node ) => dispatch( selectNode( node ) )
+    selectNode: ( nodeId ) => dispatch( selectNode( nodeId ) ),
+    moveNode: ( id, pos ) => dispatch( moveNode( { id, pos } ) ),
+    hoverNode: ( nodeId ) => dispatch( hoverNode( nodeId ) ),
+    addEdge: ( source, target ) => dispatch( addEdge( source, target ) )
   };
 };
 
