@@ -11,13 +11,17 @@ class Rect extends React.Component {
     const { x, y, width, height, rx, ry, fill } = this.props;
 
     return (
-      <rect x={x}
-        y={y}
-        width={width}
-        height={height}
-        fill={fill}
-        rx={rx}
-        ry={ry}></rect>
+      <g>
+        <rect x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill={fill}
+          rx={rx}
+          ry={ry}></rect>
+        {this.props.children}
+      </g>
+
     );
   }
 }

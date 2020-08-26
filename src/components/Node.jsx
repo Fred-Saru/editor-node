@@ -3,15 +3,17 @@ import * as d3 from 'd3';
 import { connect } from 'react-redux';
 
 import { selectNode, moveNode, hoverNode, addEdge } from '../actions';
-import Circle from './shapes/Circle';
+import Operator from './nodes/Operator';
+import Value from './nodes/Value';
 import Line from './shapes/Line';
+import Equals from './nodes/Equals';
+
 
 class Node extends React.Component {
   node;
 
   state = {
-    source: null,
-    target: null,
+    sourceId: null,
     isDrawingEdge: false,
     mousePos: null
   };
@@ -22,9 +24,10 @@ class Node extends React.Component {
       .on( "start", () => {
         if ( d3.event.sourceEvent.shiftKey ) {
           this.setState( {
-            source: this.props.node.id,
+            sourceId: this.props.node.id,
             isDrawingEdge: true,
           } );
+          this.props.hoverNode( null );
         }
       } )
       .on( "drag", () => {
@@ -48,15 +51,15 @@ class Node extends React.Component {
         // If we are not drawing a new edge we don't care
         if ( !this.state.isDrawingEdge ) return;
 
-        const target = this.props.hoveredNode;
-        const { source } = this.state;
+        const targetId = this.props.hoveredNodeId;
+        const { sourceId } = this.state;
 
-        if ( target == null ) {
+        if ( targetId == null || targetId === sourceId ) {
           this.resetEdgeDrawing();
           return;
         }
 
-        this.props.addEdge( source, target );
+        this.props.addEdge( sourceId, targetId );
         this.resetEdgeDrawing();
       } );
 
@@ -68,33 +71,30 @@ class Node extends React.Component {
         d3.event.stopPropagation();
         const { id } = this.props.node;
         this.props.selectNode( id );
-      } );
+      } )
+      .on( "mouseout", this.handleMouseOver )
+      .on( "mouseover", this.handleMouseOver );
   }
 
   resetEdgeDrawing = () => {
     this.setState( {
-      source: null,
+      sourceId: null,
       isDrawingEdge: false,
       mousePos: null
     } );
   }
 
   handleMouseOver = () => {
-
-    //if ( this.state.isDrawingEdge ) return;
+    if ( this.state.isDrawingEdge ) return;
 
     const { id } = this.props.node;
     this.props.hoverNode( id );
-    console.log( "Enter: " + id );
   }
 
   handleMouseOut = () => {
-
-    //if ( this.state.isDrawingEdge ) return;
+    if ( this.state.isDrawingEdge ) return;
 
     this.props.hoverNode( null );
-    const { id } = this.props.node;
-    console.log( "Leave: " + id );
   }
 
   renderEdge = () => {
@@ -105,20 +105,33 @@ class Node extends React.Component {
     return ( <Line start={pos} end={this.state.mousePos} /> );
   }
 
+  renderNode = () => {
+    const { node } = this.props;
+
+    switch ( node.type ) {
+      case 'operator':
+        return <Operator size={node.options.size}></Operator>
+      case 'value':
+        return <Value size={node.options.size} value={node.value}></Value>
+      case 'equal':
+        return <Equals size={node.options.size}></Equals>
+      default:
+        return null;
+    }
+  }
+
   render() {
-    const { pos, size } = this.props.node.options;
+    const { pos } = this.props.node.options;
 
     return (
       <g
-        className='node-wrapper'
-        onMouseOver={( e ) => this.handleMouseOver( e )}
-        onMouseOut={this.handleMouseOut}>
+        className='node-wrapper'>
         {this.renderEdge()}
         <g
           ref={el => this.node = el}
           transform={`translate(${pos.x}, ${pos.y})`}
           className={`node ${this.props.selectedNodeId === this.props.node.id ? 'selected' : ''}`}>
-          <Circle size={size} />
+          {this.renderNode()}
         </g>
       </g>
     );
@@ -131,7 +144,7 @@ const mapStateToProps = ( state ) => {
 
   return {
     selectedNodeId: selectedNode,
-    hoveredNode: hoveredNode
+    hoveredNodeId: hoveredNode
   };
 }
 

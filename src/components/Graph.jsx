@@ -84,24 +84,28 @@ class Graph extends React.Component {
                 fill={`url(${backgroundFillId || ''})`}
               ></rect>
               <g className="entities">
-                {
-                  this.props.edges.allIds.map( key => {
-                    const edge = this.props.edges[key];
-                    return (
-                      <Edge edge={edge} key={edge.id}>
-                      </Edge>
-                    );
-                  } )
-                }
-                {
-                  this.props.nodes.allIds.map( key => {
-                    const node = this.props.nodes[key];
-                    return (
-                      <Node node={node} key={node.id}>
-                      </Node>
-                    );
-                  } )
-                }
+                <g className="edges">
+                  {
+                    this.props.edges.allIds.map( key => {
+                      const edge = this.props.edges[key];
+                      return (
+                        <Edge edge={edge} key={edge.id}>
+                        </Edge>
+                      );
+                    } )
+                  }
+                </g>
+                <g className="nodes">
+                  {
+                    this.props.nodes.allIds.map( key => {
+                      const node = this.props.nodes[key];
+                      return (
+                        <Node node={node} key={node.id}>
+                        </Node>
+                      );
+                    } )
+                  }
+                </g>
               </g>
             </g>
           </svg>

@@ -7,18 +7,20 @@ const initialState = {
 const edgesReducer = ( state = initialState, action ) => {
   switch ( action.type ) {
     case FETCH_EDGES:
-      return {
-        'edge0': {
-          id: 'edge0',
-          source: 'circle1',
-          target: 'circle2'
-        },
-        allIds: ['edge0']
-      };
+      return state;
     case ADD_EDGE:
       const newId = `edge${state.allIds.length}`;
       const { source, target } = action.payload;
-      console.log( `Create edge between ${source} and ${target}` )
+
+      if ( Object.keys( state ).some( key => {
+        if ( key === 'allIds' ) return false;
+
+        return ( state[key].source === source && state[key].target === target )
+          || ( state[key].source === target && state[key].target === source );
+      } ) ) {
+        return state;
+      }
+
       return {
         ...state,
         [newId]: { id: newId, source, target },
