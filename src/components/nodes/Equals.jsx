@@ -3,6 +3,7 @@ import Circle from '../shapes/Circle';
 import Rect from '../shapes/Rect';
 import Line from '../shapes/Line';
 import Text from '../shapes/Text';
+import { connect } from 'react-redux';
 
 class Equals extends React.Component {
   render() {
@@ -13,10 +14,18 @@ class Equals extends React.Component {
         <Rect width={50} height={50} x={-25} y={-25} rx={5} ry={5}>
           <Text>=</Text>
         </Rect>
-        <Circle size={25} x={80} ></Circle>
+        <Circle size={25} x={80}>
+          <Text>{this.props.node.getResult( this.props.nodes )}</Text>
+        </Circle>
       </g>
     );
   }
 }
 
-export default Equals;
+const mapStateToProps = ( { nodes } ) => {
+  return {
+    nodes
+  };
+};
+
+export default connect( mapStateToProps )( Equals );

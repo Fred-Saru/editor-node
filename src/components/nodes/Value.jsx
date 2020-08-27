@@ -13,7 +13,7 @@ class Value extends React.Component {
 
     return (
       <Circle size={size}>
-        <Text>{this.props.value}</Text>
+        <Text>{this.props.node.getResult()}</Text>
       </Circle>
     );
   }

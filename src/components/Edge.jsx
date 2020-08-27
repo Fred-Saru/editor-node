@@ -21,8 +21,8 @@ class Edge extends React.Component {
 
 const mapStateToProps = ( { nodes }, ownProps ) => {
   return {
-    source: nodes[ownProps.edge.source],
-    target: nodes[ownProps.edge.target]
+    source: nodes[ownProps.edge.sourceId],
+    target: nodes[ownProps.edge.targetId]
   };
 }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import { connect } from 'react-redux';
 
-import { selectNode, moveNode, hoverNode, addEdge } from '../actions';
+import { selectNode, moveNode, hoverNode, addEdge, connectNodes } from '../actions';
 import Operator from './nodes/Operator';
 import Value from './nodes/Value';
 import Line from './shapes/Line';
@@ -60,6 +60,7 @@ class Node extends React.Component {
         }
 
         this.props.addEdge( sourceId, targetId );
+        this.props.connectNodes( sourceId, targetId );
         this.resetEdgeDrawing();
       } );
 
@@ -110,11 +111,11 @@ class Node extends React.Component {
 
     switch ( node.type ) {
       case 'operator':
-        return <Operator size={node.options.size}></Operator>
+        return <Operator node={node} size={node.options.size}></Operator>
       case 'value':
-        return <Value size={node.options.size} value={node.value}></Value>
+        return <Value node={node} size={node.options.size}></Value>
       case 'equal':
-        return <Equals size={node.options.size}></Equals>
+        return <Equals node={node} size={node.options.size}></Equals>
       default:
         return null;
     }
@@ -151,9 +152,10 @@ const mapStateToProps = ( state ) => {
 const mapDispatchToProps = ( dispatch ) => {
   return {
     selectNode: ( nodeId ) => dispatch( selectNode( nodeId ) ),
-    moveNode: ( id, pos ) => dispatch( moveNode( { id, pos } ) ),
+    moveNode: ( id, pos ) => dispatch( moveNode( id, pos ) ),
     hoverNode: ( nodeId ) => dispatch( hoverNode( nodeId ) ),
-    addEdge: ( source, target ) => dispatch( addEdge( source, target ) )
+    addEdge: ( sourceId, targetId ) => dispatch( addEdge( sourceId, targetId ) ),
+    connectNodes: ( sourceId, targetId ) => dispatch( connectNodes( sourceId, targetId ) )
   };
 };
 

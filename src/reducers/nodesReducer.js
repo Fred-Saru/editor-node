@@ -1,4 +1,4 @@
-import { FETCH_NODES, ADD_NODE, MOVE_NODE } from '../actions/actionTypes';
+import { FETCH_NODES, ADD_NODE, MOVE_NODE, CONNECT_NODES } from '../actions/actionTypes';
 
 const initialState = {
   allIds: []
@@ -7,52 +7,49 @@ const initialState = {
 
 const nodesReducer = ( state = initialState, action ) => {
   switch ( action.type ) {
-    case ADD_NODE:
+    case ADD_NODE: {
       const newId = `circle${state.allIds.length}`;
+      let node = action.payload;
+      node.id = newId;
       return {
         ...state,
-        [newId]: { id: newId, options: { pos: { x: 0, y: 0 }, size: 50 } },
+        [newId]: node,
         allIds: [...state.allIds, newId]
       };
-    case FETCH_NODES:
+    }
+    case CONNECT_NODES:
+      const { sourceId, targetId } = action.payload;
+      const source = state[sourceId];
+      const target = state[targetId];
+
+      if ( target.options.inputType == null
+        || source.options.outputType == null
+        || ( !Array.isArray( target.options.inputType ) && target.options.inputType !== source.options.outputType )
+        || ( Array.isArray( target.options.inputType ) && !target.options.inputType.some( type => type === source.options.outputType ) ) ) {
+        return state;
+      }
+
+      if ( target.hasOwnProperty( 'inputs' ) ) {
+        return {
+          ...state,
+          [targetId]: {
+            ...target,
+            inputs: [...target.inputs, sourceId]
+          }
+        };
+      }
+
       return {
-        'circle0': {
-          id: 'circle0',
-          type: 'operator',
-          options: {
-            pos: { x: 250, y: 250 },
-            size: 50
-          }
-        },
-        'circle1': {
-          id: 'circle1',
-          type: 'equal',
-          options: {
-            pos: { x: 700, y: 50 },
-            size: 25
-          }
-        },
-        'circle2': {
-          id: 'circle2',
-          type: 'value',
-          options: {
-            pos: { x: 300, y: 500 },
-            size: 25
-          },
-          value: 5
-        },
-        'circle3': {
-          id: 'circle3',
-          type: 'value',
-          options: {
-            pos: { x: 380, y: 500 },
-            size: 25
-          },
-          value: 7
-        },
-        allIds: ['circle0', 'circle1', 'circle2', 'circle3']
+        ...state,
+        [targetId]: {
+          ...target,
+          input: sourceId
+        }
       };
-    case MOVE_NODE:
+
+    case FETCH_NODES:
+      return state;
+    case MOVE_NODE: {
       const { id, pos } = action.payload;
       const node = state[id];
       return {
@@ -65,6 +62,7 @@ const nodesReducer = ( state = initialState, action ) => {
           }
         }
       };
+    }
     default:
       return state;
   }

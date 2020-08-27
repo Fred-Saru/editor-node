@@ -43,6 +43,67 @@ class Graph extends React.Component {
       } );
   }
 
+  addOperator = () => {
+    const operatorNode = {
+      type: 'operator',
+      options: {
+        pos: { x: 100, y: 100 },
+        size: 50,
+        outputType: 'number',
+        inputType: ['number', 'number']
+      },
+      inputs: []
+    };
+
+    function getResult( nodes ) {
+      return this.inputs.reduce( ( acc, input ) => acc += nodes[input].getResult(), 0 )
+    }
+
+    operatorNode.getResult = getResult;
+
+    this.props.addNode( operatorNode );
+  }
+
+  addValue = () => {
+    const valueNode = {
+      type: 'value',
+      options: {
+        pos: { x: 100, y: 100 },
+        size: 25,
+        outputType: 'number'
+      },
+      value: Math.round( Math.random() * 10 )
+    };
+
+    function getResult() {
+      return this.value;
+    }
+
+    valueNode.getResult = getResult;
+
+    this.props.addNode( valueNode );
+  }
+
+  addEqual = () => {
+    const equalNode = {
+      type: 'equal',
+      options: {
+        pos: { x: 100, y: 100 },
+        size: 25,
+        inputType: 'number'
+      },
+      input: null
+    }
+
+    function getResult( nodes ) {
+      if ( this.input )
+        return nodes[this.input].getResult( nodes );
+    };
+    equalNode.getResult = getResult;
+
+    this.props.addNode( equalNode );
+  }
+
   render() {
 
     const { x, y } = this.state;
@@ -111,7 +172,9 @@ class Graph extends React.Component {
           </svg>
         </div>
         <div className="drawer">
-          <button onClick={() => this.props.addNode()}>Add Node</button>
+          <button onClick={() => this.addOperator()}>Add Operator</button>
+          <button onClick={() => this.addValue()}>Add Value</button>
+          <button onClick={() => this.addEqual()}>Add Equal</button>
         </div>
       </>
     );
@@ -123,7 +186,7 @@ const mapDispatchToProps = ( dispatch ) => {
     resetNodeSelection: () => dispatch( selectNode( null ) ),
     getNodes: () => dispatch( getNodes() ),
     getEdges: () => dispatch( getEdges() ),
-    addNode: () => dispatch( addNode() ),
+    addNode: ( node ) => dispatch( addNode( node ) ),
   };
 }
 
