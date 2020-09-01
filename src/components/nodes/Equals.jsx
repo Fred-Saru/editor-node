@@ -10,12 +10,12 @@ class Equals extends React.Component {
 
     return (
       <g>
-        <Line end={{ x: 105, y: 0 }} />
-        <Rect width={50} height={50} x={-25} y={-25} rx={5} ry={5}>
+        <Line end={ { x: 105, y: 0 } } />
+        <Rect width={ 50 } height={ 50 } x={ -25 } y={ -25 } rx={ 5 } ry={ 5 }>
           <Text>=</Text>
         </Rect>
-        <Circle size={25} x={80}>
-          <Text>{this.props.node.getResult( this.props.nodes )}</Text>
+        <Circle size={ 25 } x={ 80 }>
+          <Text>{ this.props.node.properties.value }</Text>
         </Circle>
       </g>
     );

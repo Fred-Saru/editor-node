@@ -40,8 +40,7 @@ class Node extends React.Component {
           return;
         }
 
-        const { id, options } = this.props.node;
-        const { pos } = options;
+        const { id, pos } = this.props.node;
         const newPos = { x: pos.x + d3.event.dx, y: pos.y + d3.event.dy };
 
         this.props.moveNode( id, newPos );
@@ -102,8 +101,8 @@ class Node extends React.Component {
     if ( !this.state.isDrawingEdge
       || !this.state.mousePos ) return null;
 
-    const { pos } = this.props.node.options;
-    return ( <Line start={pos} end={this.state.mousePos} /> );
+    const { pos } = this.props.node;
+    return ( <Line start={ pos } end={ this.state.mousePos } /> );
   }
 
   renderNode = () => {
@@ -111,28 +110,28 @@ class Node extends React.Component {
 
     switch ( node.type ) {
       case 'operator':
-        return <Operator node={node} size={node.options.size}></Operator>
-      case 'value':
-        return <Value node={node} size={node.options.size}></Value>
-      case 'equal':
-        return <Equals node={node} size={node.options.size}></Equals>
+        return <Operator node={ node }></Operator>
+      case 'const':
+        return <Value node={ node }></Value>
+      case 'display':
+        return <Equals node={ node }></Equals>
       default:
         return null;
     }
   }
 
   render() {
-    const { pos } = this.props.node.options;
+    const { pos } = this.props.node;
 
     return (
       <g
         className='node-wrapper'>
-        {this.renderEdge()}
+        { this.renderEdge() }
         <g
-          ref={el => this.node = el}
-          transform={`translate(${pos.x}, ${pos.y})`}
-          className={`node ${this.props.selectedNodeId === this.props.node.id ? 'selected' : ''}`}>
-          {this.renderNode()}
+          ref={ el => this.node = el }
+          transform={ `translate(${ pos.x }, ${ pos.y })` }
+          className={ `node ${ this.props.selectedNodeId === this.props.node.id ? 'selected' : '' }` }>
+          { this.renderNode() }
         </g>
       </g>
     );

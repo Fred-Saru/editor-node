@@ -10,10 +10,11 @@ class Value extends React.Component {
 
   render() {
     const { size } = this.props;
+    const { value } = this.props.node.properties;
 
     return (
-      <Circle size={size}>
-        <Text>{this.props.node.getResult()}</Text>
+      <Circle size={ size }>
+        <Text>{ value }</Text>
       </Circle>
     );
   }

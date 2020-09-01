@@ -5,7 +5,7 @@ import Text from '../shapes/Text';
 
 class Operator extends React.Component {
   static defaultProps = {
-    size: 25,
+    size: 50,
     rx: 5,
     ry: 5
   };
@@ -15,7 +15,7 @@ class Operator extends React.Component {
     const { size, rx, ry } = this.props;
 
     return (
-      <Rect width={size} height={size} x={-size / 2} y={-size / 2} rx={rx} ry={ry}>
+      <Rect width={ size } height={ size } x={ -size / 2 } y={ -size / 2 } rx={ rx } ry={ ry }>
         <Text>+</Text>
       </Rect>
     );

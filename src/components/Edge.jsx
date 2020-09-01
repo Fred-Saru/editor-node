@@ -12,7 +12,7 @@ class Edge extends React.Component {
       <g
         className='edge-wrapper'>
         <g className='edge'>
-          <Line start={this.props.source.options.pos} end={this.props.target.options.pos} />
+          <Line start={ this.props.source.pos } end={ this.props.target.pos } />
         </g>
       </g>
     );
@@ -21,8 +21,8 @@ class Edge extends React.Component {
 
 const mapStateToProps = ( { nodes }, ownProps ) => {
   return {
-    source: nodes[ownProps.edge.sourceId],
-    target: nodes[ownProps.edge.targetId]
+    source: nodes[ ownProps.edge.sourceId ],
+    target: nodes[ ownProps.edge.targetId ]
   };
 }
 

@@ -46,62 +46,65 @@ class Graph extends React.Component {
   addOperator = () => {
     const operatorNode = {
       type: 'operator',
-      options: {
-        pos: { x: 100, y: 100 },
-        size: 50,
-        outputType: 'number',
-        inputType: ['number', 'number']
+      pos: { x: 100, y: 100 },
+      inputs: {
+        'a': {
+          type: 'number',
+          link: null
+        },
+        'b': {
+          type: 'number',
+          link: null
+        }
       },
-      inputs: []
+      outputs: {
+        'total': {
+          type: 'number',
+          links: null
+        }
+      },
+      properties: {
+        'value': 0
+      }
     };
-
-    function getResult( nodes ) {
-      return this.inputs.reduce( ( acc, input ) => acc += nodes[input].getResult(), 0 )
-    }
-
-    operatorNode.getResult = getResult;
 
     this.props.addNode( operatorNode );
   }
 
-  addValue = () => {
-    const valueNode = {
-      type: 'value',
-      options: {
-        pos: { x: 100, y: 100 },
-        size: 25,
-        outputType: 'number'
+  addConstant = () => {
+    const constNode = {
+      type: 'const',
+      pos: { x: 100, y: 100 },
+      outputs: {
+        'value': {
+          type: 'number',
+          links: null
+        }
       },
-      value: Math.round( Math.random() * 10 )
+      properties: {
+        value: Math.round( Math.random() * 10 )
+      }
     };
 
-    function getResult() {
-      return this.value;
-    }
-
-    valueNode.getResult = getResult;
-
-    this.props.addNode( valueNode );
+    this.props.addNode( constNode );
   }
 
-  addEqual = () => {
-    const equalNode = {
-      type: 'equal',
-      options: {
-        pos: { x: 100, y: 100 },
-        size: 25,
-        inputType: 'number'
+  addDisplay = () => {
+    const displayNode = {
+      type: 'display',
+      pos: { x: 100, y: 100 },
+      inputs: {
+        'entry': {
+          type: 'any',
+          link: null
+        }
       },
-      input: null
+      properties: {
+        value: null
+      }
     }
 
-    function getResult( nodes ) {
-      if ( this.input )
-        return nodes[this.input].getResult( nodes );
-    };
-    equalNode.getResult = getResult;
-
-    this.props.addNode( equalNode );
+    this.props.addNode( displayNode );
   }
 
   render() {
@@ -120,8 +123,8 @@ class Graph extends React.Component {
             <defs>
               <pattern
                 id="grid"
-                width={gridSpacing}
-                height={gridSpacing}
+                width={ gridSpacing }
+                height={ gridSpacing }
                 patternUnits="userSpaceOnUse"
               >
                 <circle
@@ -134,23 +137,23 @@ class Graph extends React.Component {
             </defs>
             <g
               className="view"
-              ref={el => this.view = el}
-              transform={`translate(${x}, ${y})`}>
+              ref={ el => this.view = el }
+              transform={ `translate(${ x }, ${ y })` }>
               <rect
                 className="background"
-                x={-( gridSize || 0 ) / 4}
-                y={-( gridSize || 0 ) / 4}
-                width={gridSize}
-                height={gridSize}
-                fill={`url(${backgroundFillId || ''})`}
+                x={ -( gridSize || 0 ) / 4 }
+                y={ -( gridSize || 0 ) / 4 }
+                width={ gridSize }
+                height={ gridSize }
+                fill={ `url(${ backgroundFillId || '' })` }
               ></rect>
               <g className="entities">
                 <g className="edges">
                   {
                     this.props.edges.allIds.map( key => {
-                      const edge = this.props.edges[key];
+                      const edge = this.props.edges[ key ];
                       return (
-                        <Edge edge={edge} key={edge.id}>
+                        <Edge edge={ edge } key={ edge.id }>
                         </Edge>
                       );
                     } )
@@ -159,9 +162,9 @@ class Graph extends React.Component {
                 <g className="nodes">
                   {
                     this.props.nodes.allIds.map( key => {
-                      const node = this.props.nodes[key];
+                      const node = this.props.nodes[ key ];
                       return (
-                        <Node node={node} key={node.id}>
+                        <Node node={ node } key={ node.id }>
                         </Node>
                       );
                     } )
@@ -172,9 +175,9 @@ class Graph extends React.Component {
           </svg>
         </div>
         <div className="drawer">
-          <button onClick={() => this.addOperator()}>Add Operator</button>
-          <button onClick={() => this.addValue()}>Add Value</button>
-          <button onClick={() => this.addEqual()}>Add Equal</button>
+          <button onClick={ () => this.addOperator() }>Add Operator</button>
+          <button onClick={ () => this.addConstant() }>Add Constant</button>
+          <button onClick={ () => this.addDisplay() }>Add Equal</button>
         </div>
       </>
     );
