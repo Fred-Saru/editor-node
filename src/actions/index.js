@@ -1,4 +1,4 @@
-import { NODE_SELECT, NODE_HOVER, FETCH_NODES, ADD_NODE, FETCH_EDGES, MOVE_NODE, ADD_EDGE, CONNECT_NODES } from './actionTypes';
+import { NODE_SELECT, NODE_HOVER, FETCH_NODES, ADD_NODE, FETCH_EDGES, MOVE_NODE, ADD_EDGE, CONNECT_NODES, UPDATE_OUTPUT } from './actionTypes';
 
 export const getNodes = () => {
   return {
@@ -20,12 +20,19 @@ export const moveNode = ( id, pos ) => {
   };
 };
 
-export const connectNodes = ( sourceId, targetId ) => {
+export const connectNodes = ( sourceId, sourceSlot, targetId, targetSlot ) => {
   return {
     type: CONNECT_NODES,
-    payload: { sourceId, targetId }
+    payload: { sourceId, sourceSlot, targetId, targetSlot }
   };
 };
+
+export const updateNodeOutput = ( nodeId, slotId, value ) => {
+  return {
+    type: UPDATE_OUTPUT,
+    payload: { nodeId, slotId, value }
+  }
+}
 
 export const getEdges = () => {
   return {

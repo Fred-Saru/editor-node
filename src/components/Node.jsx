@@ -7,9 +7,17 @@ import Operator from './nodes/Operator';
 import Value from './nodes/Value';
 import Line from './shapes/Line';
 import Equals from './nodes/Equals';
+import Rect from './shapes/Rect';
+import Text from './shapes/Text';
 
 
 class Node extends React.Component {
+  static defaultProps = {
+    size: 50,
+    rx: 5,
+    ry: 5
+  };
+
   node;
 
   state = {
@@ -59,7 +67,7 @@ class Node extends React.Component {
         }
 
         this.props.addEdge( sourceId, targetId );
-        this.props.connectNodes( sourceId, targetId );
+        this.props.connectNodes( sourceId, "value", targetId, "a" );
         this.resetEdgeDrawing();
       } );
 
@@ -102,7 +110,7 @@ class Node extends React.Component {
       || !this.state.mousePos ) return null;
 
     const { pos } = this.props.node;
-    return ( <Line start={ pos } end={ this.state.mousePos } /> );
+    return ( <Line start={pos} end={this.state.mousePos} /> );
   }
 
   renderNode = () => {
@@ -110,29 +118,39 @@ class Node extends React.Component {
 
     switch ( node.type ) {
       case 'operator':
-        return <Operator node={ node }></Operator>
+        return <Operator node={node}></Operator>
       case 'const':
-        return <Value node={ node }></Value>
+        return <Value node={node}></Value>
       case 'display':
-        return <Equals node={ node }></Equals>
+        return <Equals node={node}></Equals>
       default:
         return null;
     }
   }
 
   render() {
-    const { pos } = this.props.node;
+    const { node, size, rx, ry } = this.props;
+    const { pos } = node;
 
     return (
       <g
         className='node-wrapper'>
-        { this.renderEdge() }
-        <g
-          ref={ el => this.node = el }
-          transform={ `translate(${ pos.x }, ${ pos.y })` }
-          className={ `node ${ this.props.selectedNodeId === this.props.node.id ? 'selected' : '' }` }>
-          { this.renderNode() }
-        </g>
+        {this.renderEdge()}
+
+        <svg
+          ref={el => this.node = el}
+          x={pos.x} y={pos.y}
+          className={`node ${this.props.selectedNodeId === this.props.node.id ? 'selected' : ''}`}>
+          <Rect width={size} height={size} x={0} y={0} rx={rx} ry={ry}>
+            <svg x={0} y={0}>
+              <Text y={10} x={size / 2}>Title</Text>
+              <Line start={{ x: 0, y: 18 }} end={{ x: size, y: 18 }}></Line>
+            </svg>
+            <svg x={0} y={18} width={size} height={size - 18} viewBox={`-12.5 -9 ${size / 2} ${( size - 18 ) / 2}`}>
+              {this.renderNode()}
+            </svg>
+          </Rect>
+        </svg>
       </g>
     );
   }
@@ -154,7 +172,7 @@ const mapDispatchToProps = ( dispatch ) => {
     moveNode: ( id, pos ) => dispatch( moveNode( id, pos ) ),
     hoverNode: ( nodeId ) => dispatch( hoverNode( nodeId ) ),
     addEdge: ( sourceId, targetId ) => dispatch( addEdge( sourceId, targetId ) ),
-    connectNodes: ( sourceId, targetId ) => dispatch( connectNodes( sourceId, targetId ) )
+    connectNodes: ( sourceId, sourceSlot, targetId, targetSlot ) => dispatch( connectNodes( sourceId, sourceSlot, targetId, targetSlot ) )
   };
 };
 

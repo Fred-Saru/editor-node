@@ -6,23 +6,35 @@ import Text from '../shapes/Text';
 import { connect } from 'react-redux';
 
 class Equals extends React.Component {
-  render() {
 
+  getValue = () => {
+    const { inputs } = this.props.node;
+
+    if ( !inputs.entry.link ) return null;
+
+    const { link } = inputs.entry;
+    const source = this.props.nodes[link];
+
+    return source.outputs.total.value;
+  }
+
+  render() {
     return (
       <g>
-        <Line end={ { x: 105, y: 0 } } />
-        <Rect width={ 50 } height={ 50 } x={ -25 } y={ -25 } rx={ 5 } ry={ 5 }>
+        {/* <Line end={{ x: 105, y: 0 }} />
+        <Rect width={50} height={50} x={-25} y={-25} rx={5} ry={5}>
           <Text>=</Text>
         </Rect>
-        <Circle size={ 25 } x={ 80 }>
-          <Text>{ this.props.node.properties.value }</Text>
-        </Circle>
+        <Circle size={25} x={80}> */}
+        <Text>{this.getValue()}</Text>
+        {/* </Circle> */}
       </g>
     );
   }
 }
 
-const mapStateToProps = ( { nodes } ) => {
+const mapStateToProps = ( { graph } ) => {
+  const { nodes } = graph;
   return {
     nodes
   };

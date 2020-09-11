@@ -49,22 +49,23 @@ class Graph extends React.Component {
       pos: { x: 100, y: 100 },
       inputs: {
         'a': {
+          name: 'a',
           type: 'number',
           link: null
         },
         'b': {
+          name: 'b',
           type: 'number',
           link: null
         }
       },
       outputs: {
         'total': {
+          name: 'total',
           type: 'number',
+          value: 0,
           links: null
         }
-      },
-      properties: {
-        'value': 0
       }
     };
 
@@ -77,12 +78,11 @@ class Graph extends React.Component {
       pos: { x: 100, y: 100 },
       outputs: {
         'value': {
+          name: 'value',
           type: 'number',
+          value: Math.round( Math.random() * 10 ),
           links: null
         }
-      },
-      properties: {
-        value: Math.round( Math.random() * 10 )
       }
     };
 
@@ -95,12 +95,10 @@ class Graph extends React.Component {
       pos: { x: 100, y: 100 },
       inputs: {
         'entry': {
+          name: 'entry',
           type: 'any',
           link: null
         }
-      },
-      properties: {
-        value: null
       }
     }
 
@@ -123,8 +121,8 @@ class Graph extends React.Component {
             <defs>
               <pattern
                 id="grid"
-                width={ gridSpacing }
-                height={ gridSpacing }
+                width={gridSpacing}
+                height={gridSpacing}
                 patternUnits="userSpaceOnUse"
               >
                 <circle
@@ -137,23 +135,23 @@ class Graph extends React.Component {
             </defs>
             <g
               className="view"
-              ref={ el => this.view = el }
-              transform={ `translate(${ x }, ${ y })` }>
+              ref={el => this.view = el}
+              transform={`translate(${x}, ${y})`}>
               <rect
                 className="background"
-                x={ -( gridSize || 0 ) / 4 }
-                y={ -( gridSize || 0 ) / 4 }
-                width={ gridSize }
-                height={ gridSize }
-                fill={ `url(${ backgroundFillId || '' })` }
+                x={-( gridSize || 0 ) / 4}
+                y={-( gridSize || 0 ) / 4}
+                width={gridSize}
+                height={gridSize}
+                fill={`url(${backgroundFillId || ''})`}
               ></rect>
               <g className="entities">
                 <g className="edges">
                   {
-                    this.props.edges.allIds.map( key => {
-                      const edge = this.props.edges[ key ];
+                    this.props.allLinkIds.map( key => {
+                      const link = this.props.links[key];
                       return (
-                        <Edge edge={ edge } key={ edge.id }>
+                        <Edge edge={link} key={key}>
                         </Edge>
                       );
                     } )
@@ -161,10 +159,10 @@ class Graph extends React.Component {
                 </g>
                 <g className="nodes">
                   {
-                    this.props.nodes.allIds.map( key => {
-                      const node = this.props.nodes[ key ];
+                    this.props.allNodeIds.map( key => {
+                      const node = this.props.nodes[key];
                       return (
-                        <Node node={ node } key={ node.id }>
+                        <Node node={node} key={key}>
                         </Node>
                       );
                     } )
@@ -175,9 +173,9 @@ class Graph extends React.Component {
           </svg>
         </div>
         <div className="drawer">
-          <button onClick={ () => this.addOperator() }>Add Operator</button>
-          <button onClick={ () => this.addConstant() }>Add Constant</button>
-          <button onClick={ () => this.addDisplay() }>Add Equal</button>
+          <button onClick={() => this.addOperator()}>Add Operator</button>
+          <button onClick={() => this.addConstant()}>Add Constant</button>
+          <button onClick={() => this.addDisplay()}>Add Equal</button>
         </div>
       </>
     );
@@ -193,10 +191,13 @@ const mapDispatchToProps = ( dispatch ) => {
   };
 }
 
-const mapStateToProps = ( { nodes, edges } ) => {
+const mapStateToProps = ( { graph } ) => {
+  const { nodes, links, allNodeIds, allLinkIds } = graph;
   return {
     nodes,
-    edges
+    links,
+    allNodeIds,
+    allLinkIds
   };
 }
 

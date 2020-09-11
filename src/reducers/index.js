@@ -1,15 +1,11 @@
 import { combineReducers } from 'redux';
 
-import nodesReducer from './nodesReducer';
+import graphReducer from './graphReducer';
 import nodeSelectionReducer from './nodeSelectionReducer';
 import nodeHoveringReducer from './nodeHoveringReducer';
 
-import edgesReducer from './edgesReducer';
-
-
 export default combineReducers( {
-  nodes: nodesReducer,
-  edges: edgesReducer,
+  graph: graphReducer,
   selectedNode: nodeSelectionReducer,
   hoveredNode: nodeHoveringReducer
 } );

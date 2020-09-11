@@ -12,17 +12,18 @@ class Edge extends React.Component {
       <g
         className='edge-wrapper'>
         <g className='edge'>
-          <Line start={ this.props.source.pos } end={ this.props.target.pos } />
+          <Line start={this.props.source.pos} end={this.props.target.pos} />
         </g>
       </g>
     );
   }
 }
 
-const mapStateToProps = ( { nodes }, ownProps ) => {
+const mapStateToProps = ( { graph }, ownProps ) => {
+  const { nodes } = graph;
   return {
-    source: nodes[ ownProps.edge.sourceId ],
-    target: nodes[ ownProps.edge.targetId ]
+    source: nodes[ownProps.edge.sourceId],
+    target: nodes[ownProps.edge.targetId]
   };
 }
 
