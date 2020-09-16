@@ -1,5 +1,4 @@
 import React from 'react';
-import * as d3 from 'd3';
 
 import Node from './Node';
 import Edge from './Edge';
@@ -13,14 +12,40 @@ class Graph extends React.Component {
     backgroundFillId: "#grid"
   };
 
-  view;
+  graphWrapper;
+  backgroundWrapper;
+  graph;
 
   constructor( props ) {
     super( props );
     this.state = {
       x: 0,
-      y: 0
+      y: 0,
+      dx: 0,
+      dy: 0,
+      mouseX: 0,
+      mouseY: 0,
+      width: 1366,
+      height: 667,
+      scale: 1,
+      dragging: false
     };
+  }
+
+  getMousePosition = ( e ) => {
+    const screenCTM = this.graphWrapper.getScreenCTM();
+    return {
+      x: ( e.clientX - screenCTM.e ) / screenCTM.a,
+      y: ( e.clientY - screenCTM.f ) / screenCTM.d
+    };
+  }
+
+  resetDisplay = () => {
+    this.setState( {
+      x: 0,
+      y: 0,
+      scale: 1
+    } );
   }
 
   componentDidMount() {
@@ -28,25 +53,62 @@ class Graph extends React.Component {
     this.props.getNodes();
     this.props.getEdges();
 
-    const drag = d3.drag()
-      .on( "drag", () => {
-        this.setState( {
-          x: ( this.state.x ) + d3.event.dx,
-          y: ( this.state.y ) + d3.event.dy,
-        } );
-      } );
+    this.backgroundWrapper.addEventListener( "click", () => {
+      this.props.resetNodeSelection()
+    } );
 
-    d3.select( this.view )
-      .call( drag )
-      .on( "click", () => {
-        this.props.resetNodeSelection()
+    this.backgroundWrapper.addEventListener( "mousedown", ( e ) => {
+      e.preventDefault();
+      const offset = this.getMousePosition( e );
+      this.setState(
+        {
+          dragging: true,
+          dx: offset.x + this.state.x,
+          dy: offset.y + this.state.y
+        } );
+    } );
+
+    this.backgroundWrapper.addEventListener( "mousemove", ( e ) => {
+      e.preventDefault();
+      const coord = this.getMousePosition( e );
+
+      if ( this.state.dragging ) {
+        this.setState( {
+          x: -( coord.x - this.state.dx ),
+          y: -( coord.y - this.state.dy )
+        } );
+      }
+
+      this.setState( {
+        mouseX: coord.x,
+        mouseY: coord.y
+      } )
+
+    } );
+
+    this.backgroundWrapper.addEventListener( "mouseup", ( e ) => {
+      e.preventDefault();
+
+      this.setState(
+        {
+          dragging: false
+        } );
+    } );
+
+    this.backgroundWrapper.addEventListener( "wheel", ( e ) => {
+      e.preventDefault();
+      const scale = this.state.scale + e.deltaY * -0.001;
+      this.setState( {
+        scale: Math.min( 2, Math.max( 0.5, scale ) )
       } );
+    } );
+
   }
 
   addOperator = () => {
     const operatorNode = {
       type: 'operator',
-      pos: { x: 100, y: 100 },
+      pos: { x: 200, y: 100 },
       inputs: {
         'a': {
           name: 'a',
@@ -107,7 +169,13 @@ class Graph extends React.Component {
 
   render() {
 
-    const { x, y } = this.state;
+    const { x, y, width, height, scale } = this.state;
+    const viewBox = [
+      x / scale,
+      y / scale,
+      width / scale,
+      height / scale
+    ].join( " " );
 
     const {
       gridSpacing,
@@ -116,8 +184,9 @@ class Graph extends React.Component {
 
     return (
       <>
-        <div className="graph-wrapper">
-          <svg className="graph">
+        {/* <div > */}
+        <svg className="graph-wrapper" ref={el => this.graphWrapper = el}>
+          <svg className="graph" viewBox={viewBox} ref={el => this.graph = el}>
             <defs>
               <pattern
                 id="grid"
@@ -135,8 +204,7 @@ class Graph extends React.Component {
             </defs>
             <g
               className="view"
-              ref={el => this.view = el}
-              transform={`translate(${x}, ${y})`}>
+              ref={el => this.backgroundWrapper = el}>
               <rect
                 className="background"
                 x={-( gridSize || 0 ) / 4}
@@ -145,6 +213,8 @@ class Graph extends React.Component {
                 height={gridSize}
                 fill={`url(${backgroundFillId || ''})`}
               ></rect>
+              <line x1="0" y1="0" x2="0" y2="100" stroke="black"></line>
+              <line x1="0" y1="0" x2="100" y2="0" stroke="black"></line>
               <g className="entities">
                 <g className="edges">
                   {
@@ -171,11 +241,14 @@ class Graph extends React.Component {
               </g>
             </g>
           </svg>
-        </div>
+          <text x={50} y={660}>{`X: ${this.state.mouseX}, Y: ${this.state.mouseY}`}</text>
+        </svg>
+        {/* </div> */}
         <div className="drawer">
           <button onClick={() => this.addOperator()}>Add Operator</button>
           <button onClick={() => this.addConstant()}>Add Constant</button>
           <button onClick={() => this.addDisplay()}>Add Equal</button>
+          <button onClick={this.resetDisplay}>Reset</button>
         </div>
       </>
     );

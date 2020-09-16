@@ -1,5 +1,4 @@
 import React from 'react';
-import * as d3 from 'd3';
 import { connect } from 'react-redux';
 
 import { selectNode, moveNode, hoverNode, addEdge, connectNodes } from '../actions';
@@ -20,68 +19,121 @@ class Node extends React.Component {
 
   node;
 
-  state = {
-    sourceId: null,
-    isDrawingEdge: false,
-    mousePos: null
-  };
+  constructor( props ) {
+    super( props );
+    this.state = {
+      sourceId: null,
+      isDrawingEdge: false,
+      isDragging: false,
+      mousePos: null,
+      dx: 0,
+      dy: 0,
+      x: props.node.pos.x,
+      y: props.node.pos.y
+    };
+  }
+
+
+  getMousePosition = ( e ) => {
+    const screenCTM = this.node.getScreenCTM();
+    return {
+      x: ( e.clientX - screenCTM.e ) / screenCTM.a,
+      y: ( e.clientY - screenCTM.f ) / screenCTM.d
+    };
+  }
 
   componentDidMount() {
 
-    const drag = d3.drag()
-      .on( "start", () => {
-        if ( d3.event.sourceEvent.shiftKey ) {
-          this.setState( {
-            sourceId: this.props.node.id,
-            isDrawingEdge: true,
-          } );
-          this.props.hoverNode( null );
-        }
-      } )
-      .on( "drag", () => {
+    const graph = this.node.parentNode.parentNode.parentNode.parentNode;
 
-        if ( this.state.isDrawingEdge ) {
-          const { x, y } = d3.event;
-          this.setState( {
-            mousePos: { x, y }
-          } );
-          return;
-        }
+    this.node.addEventListener( "mousedown", ( e ) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-        const { id, pos } = this.props.node;
-        const newPos = { x: pos.x + d3.event.dx, y: pos.y + d3.event.dy };
+      if ( e.shiftKey ) {
+        this.setState( {
+          sourceId: this.props.node.id,
+          isDrawingEdge: true,
+        } );
+        this.props.hoverNode( null );
+        return;
+      }
 
-        this.props.moveNode( id, newPos );
+      const offset = this.getMousePosition( e );
 
-      } )
-      .on( "end", () => {
-        // If we are not drawing a new edge we don't care
-        if ( !this.state.isDrawingEdge ) return;
-
-        const targetId = this.props.hoveredNodeId;
-        const { sourceId } = this.state;
-
-        if ( targetId == null || targetId === sourceId ) {
-          this.resetEdgeDrawing();
-          return;
-        }
-
-        this.props.addEdge( sourceId, targetId );
-        this.props.connectNodes( sourceId, "value", targetId, "a" );
-        this.resetEdgeDrawing();
+      this.setState( {
+        dx: offset.x,
+        dy: offset.y,
+        isDragging: true
       } );
+    } );
 
-    d3.select( this.node )
-      .call( drag );
+    this.node.addEventListener( "mousemove", ( e ) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    d3.select( this.node )
-      .on( "click", () => {
-        d3.event.stopPropagation();
+      const coord = this.getMousePosition( e );
+
+      if ( this.state.isDrawingEdge ) {
+        this.setState( {
+          mousePos: { x: coord.x, y: coord.y }
+        } );
+        return;
+      }
+
+      if ( this.state.isDragging ) {
+        const { pos } = this.props.node;
+
+        this.setState( {
+          x: pos.x + coord.x - this.state.dx,
+          y: pos.y + coord.y - this.state.dy
+        } );
+      }
+    } );
+
+    this.node.addEventListener( "mouseup", ( e ) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // We are not dragging anymore
+      if ( this.state.isDragging ) {
         const { id } = this.props.node;
-        this.props.selectNode( id );
-      } )
-      .on( "mouseout", this.handleMouseOver )
-      .on( "mouseover", this.handleMouseOver );
+        const { x, y } = this.state;
+
+        this.setState( {
+          isDragging: false
+        } );
+
+        this.props.moveNode( id, { x, y } );
+        return;
+      }
+
+      // If we are not drawing a new edge we don't care
+      if ( !this.state.isDrawingEdge ) { return; }
+
+      const targetId = this.props.hoveredNodeId;
+      const { sourceId } = this.state;
+
+      if ( targetId == null || targetId === sourceId ) {
+        this.resetEdgeDrawing();
+        return;
+      }
+
+      this.props.addEdge( sourceId, targetId );
+      this.props.connectNodes( sourceId, "value", targetId, "a" );
+      this.resetEdgeDrawing();
+    } );
+
+    // this.node.addEventListener( "click", ( e ) => {
+    //   e.stopPropagation();
+    //   e.preventDefault();
+
+    //   const { id } = this.props.node;
+    //   this.props.selectNode( id )
+    // } );
+
+    // this.node.addEventListener( "mouseenter", this.handleMouseEnter );
+    // this.node.addEventListener( "mouseleave", this.handleMouseLeave );
   }
 
   resetEdgeDrawing = () => {
@@ -92,17 +144,22 @@ class Node extends React.Component {
     } );
   }
 
-  handleMouseOver = () => {
+  handleMouseEnter = () => {
     if ( this.state.isDrawingEdge ) return;
 
     const { id } = this.props.node;
     this.props.hoverNode( id );
   }
 
-  handleMouseOut = () => {
+  handleMouseLeave = () => {
     if ( this.state.isDrawingEdge ) return;
 
     this.props.hoverNode( null );
+  }
+
+  handleClick = () => {
+    const { id } = this.props.node;
+    this.props.selectNode( id )
   }
 
   renderEdge = () => {
@@ -130,8 +187,8 @@ class Node extends React.Component {
 
   render() {
     const { node, size, rx, ry } = this.props;
-    const { pos } = node;
-
+    const { x, y } = this.state;
+    const { id: nodeId } = node;
     return (
       <g
         className='node-wrapper'>
@@ -139,8 +196,11 @@ class Node extends React.Component {
 
         <svg
           ref={el => this.node = el}
-          x={pos.x} y={pos.y}
-          className={`node ${this.props.selectedNodeId === this.props.node.id ? 'selected' : ''}`}>
+          x={x} y={y}
+          className={`node ${this.props.selectedNodeId === nodeId ? 'selected' : ''}`}
+          onMouseEnter={this.handleMouseEnter}
+          onMouseLeave={this.handleMouseLeave}
+          onClick={this.handleClick}>
           <Rect width={size} height={size} x={0} y={0} rx={rx} ry={ry}>
             <svg x={0} y={0}>
               <Text y={10} x={size / 2}>Title</Text>

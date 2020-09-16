@@ -11,7 +11,7 @@ class Rect extends React.Component {
     const { x, y, width, height, rx, ry, fill } = this.props;
 
     return (
-      <g transform={`translate(${x + width / 2}, ${y + height / 2})`}>
+      <g transform={`translate(${1}, ${1})`}>
         <rect x={x}
           y={y}
           width={width}

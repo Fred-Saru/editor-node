@@ -10,7 +10,7 @@ class Line extends React.Component {
     const { start, end } = this.props;
 
     return (
-      <line x1={start.x} y1={start.y} x2={end.x} y2={end.y}>
+      <line x1={start.x} y1={start.y} x2={end.x} y2={end.y} stroke="black">
         {this.props.children}
       </line>
     );
