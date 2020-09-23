@@ -1,8 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import Node from './Node';
 import Edge from './Edge';
-import { connect } from 'react-redux';
 import { getNodes, addNode, getEdges, selectNode } from '../actions';
 
 class Graph extends React.Component {
@@ -48,61 +48,61 @@ class Graph extends React.Component {
     } );
   }
 
-  componentDidMount() {
+  handleMouseClick = ( e ) => {
+    e.stopPropagation();
+    this.props.resetNodeSelection();
+  }
 
-    this.props.getNodes();
-    this.props.getEdges();
-
-    this.backgroundWrapper.addEventListener( "click", () => {
-      this.props.resetNodeSelection()
+  handleMouseWheel = ( e ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const scale = this.state.scale + e.deltaY * -0.001;
+    this.setState( {
+      scale: Math.min( 2, Math.max( 0.5, scale ) )
     } );
+  }
 
-    this.backgroundWrapper.addEventListener( "mousedown", ( e ) => {
-      e.preventDefault();
-      const offset = this.getMousePosition( e );
-      this.setState(
-        {
-          dragging: true,
-          dx: offset.x + this.state.x,
-          dy: offset.y + this.state.y
-        } );
-    } );
+  handleMouseDown = ( e ) => {
+    e.stopPropagation();
 
-    this.backgroundWrapper.addEventListener( "mousemove", ( e ) => {
-      e.preventDefault();
-      const coord = this.getMousePosition( e );
-
-      if ( this.state.dragging ) {
-        this.setState( {
-          x: -( coord.x - this.state.dx ),
-          y: -( coord.y - this.state.dy )
-        } );
-      }
-
-      this.setState( {
-        mouseX: coord.x,
-        mouseY: coord.y
-      } )
-
-    } );
-
-    this.backgroundWrapper.addEventListener( "mouseup", ( e ) => {
-      e.preventDefault();
-
-      this.setState(
-        {
-          dragging: false
-        } );
-    } );
-
-    this.backgroundWrapper.addEventListener( "wheel", ( e ) => {
-      e.preventDefault();
-      const scale = this.state.scale + e.deltaY * -0.001;
-      this.setState( {
-        scale: Math.min( 2, Math.max( 0.5, scale ) )
+    const offset = this.getMousePosition( e );
+    this.setState(
+      {
+        dragging: true,
+        dx: offset.x + this.state.x,
+        dy: offset.y + this.state.y
       } );
-    } );
 
+  }
+
+  handleMouseUp = ( e ) => {
+    e.stopPropagation();
+
+    this.setState(
+      {
+        dragging: false
+      } );
+  }
+
+  handleMouseMove = ( e ) => {
+    e.stopPropagation();
+
+    const coord = this.getMousePosition( e );
+
+    if ( this.state.dragging ) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      this.setState( {
+        x: -( coord.x - this.state.dx ),
+        y: -( coord.y - this.state.dy )
+      } );
+    }
+
+    this.setState( {
+      mouseX: coord.x,
+      mouseY: coord.y
+    } )
   }
 
   addOperator = () => {
@@ -185,7 +185,12 @@ class Graph extends React.Component {
     return (
       <>
         {/* <div > */}
-        <svg className="graph-wrapper" ref={el => this.graphWrapper = el}>
+        <svg className="graph-wrapper" ref={el => this.graphWrapper = el}
+          onMouseDown={this.handleMouseDown}
+          onMouseUp={this.handleMouseUp}
+          onClick={this.handleMouseClick}
+          onWheel={this.handleMouseWheel}
+          onMouseMove={this.handleMouseMove}>
           <svg className="graph" viewBox={viewBox} ref={el => this.graph = el}>
             <defs>
               <pattern

@@ -10,16 +10,15 @@ class Circle extends React.Component {
   render() {
     const { x, y, size, fill } = this.props;
     return (
-      <g transform={`translate(${x}, ${y})`}>
+      <>
         <circle
           className="circle"
-          cx={0}
-          cy={0}
+          cx={x}
+          cy={y}
           r={size}
           fill={fill}></circle>
         {this.props.children}
-      </g>
-
+      </>
     );
   }
 }

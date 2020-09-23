@@ -1,6 +1,5 @@
 import React from 'react';
 
-import Rect from '../shapes/Rect';
 import Text from '../shapes/Text';
 import { connect } from 'react-redux';
 import { updateNodeOutput } from '../../actions';
@@ -51,13 +50,8 @@ class Operator extends React.Component {
   }
 
   render() {
-
-    const { size, rx, ry } = this.props;
-
     return (
-      //<Rect width={size} height={size} x={-size / 2} y={-size / 2} rx={rx} ry={ry}>
       <Text>+</Text>
-      //</Rect>
     );
   }
 }
