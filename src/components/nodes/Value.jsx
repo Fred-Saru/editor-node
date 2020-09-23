@@ -9,12 +9,13 @@ class Value extends React.Component {
   };
 
   render() {
+    const { size } = this.props;
     const { value } = this.props.node.outputs;
 
     return (
       <>
-        <Handle x={5} y={20}></Handle>
-        <Text>{value.value}</Text>
+        <Handle x={size} y={18}></Handle>
+        <Text x={'50%'} y={'50%'}>{value.value}</Text>
       </>
     );
   }

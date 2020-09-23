@@ -125,15 +125,15 @@ class Node extends React.Component {
   }
 
   renderNode = () => {
-    const { node } = this.props;
+    const { node, size } = this.props;
 
     switch ( node.type ) {
       case 'operator':
-        return <Operator node={node}></Operator>
+        return <Operator node={node} size={size}></Operator>
       case 'const':
-        return <Value node={node}></Value>
+        return <Value node={node} size={size}></Value>
       case 'display':
-        return <Equals node={node}></Equals>
+        return <Equals node={node} size={size}></Equals>
       default:
         return null;
     }
@@ -164,9 +164,9 @@ class Node extends React.Component {
               <Text y={10} x={size / 2}>Title</Text>
               <Line start={{ x: 0, y: 18 }} end={{ x: size, y: 18 }}></Line>
             </svg>
-
-            {this.renderNode()}
-
+            <svg x={0} y={18} width={size} height={size - 18} viewBox={`0 0 ${size} ${size}`} preserveAspectRatio="xMidYMid meet">
+              {this.renderNode()}
+            </svg>
           </Rect>
         </svg>
       </g>

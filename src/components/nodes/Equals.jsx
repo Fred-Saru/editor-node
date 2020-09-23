@@ -1,6 +1,7 @@
 import React from 'react';
 import Text from '../shapes/Text';
 import { connect } from 'react-redux';
+import Handle from '../Handle';
 
 class Equals extends React.Component {
 
@@ -17,7 +18,10 @@ class Equals extends React.Component {
 
   render() {
     return (
-      <Text>{this.getValue()}</Text>
+      <>
+        <Handle x={0} y={18}></Handle>
+        <Text>{this.getValue()}</Text>
+      </>
     );
   }
 }

@@ -3,6 +3,7 @@ import React from 'react';
 import Text from '../shapes/Text';
 import { connect } from 'react-redux';
 import { updateNodeOutput } from '../../actions';
+import Handle from '../Handle';
 
 class Operator extends React.Component {
   static defaultProps = {
@@ -50,8 +51,16 @@ class Operator extends React.Component {
   }
 
   render() {
+
+    const { size } = this.props;
+
     return (
-      <Text>+</Text>
+      <>
+        <Handle x={size} y={18}></Handle>
+        <Handle x={0} y={18}></Handle>
+        <Handle x={0} y={size - 18}></Handle>
+        <Text x={'50%'} y={'50%'}>+</Text>
+      </>
     );
   }
 }

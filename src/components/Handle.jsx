@@ -5,7 +5,7 @@ class Handle extends React.Component {
   static defaultProps = {
     x: 0,
     y: 0,
-    size: 4
+    size: 6
   }
   render() {
 

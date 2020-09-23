@@ -218,8 +218,6 @@ class Graph extends React.Component {
                 height={gridSize}
                 fill={`url(${backgroundFillId || ''})`}
               ></rect>
-              <line x1="0" y1="0" x2="0" y2="100" stroke="black"></line>
-              <line x1="0" y1="0" x2="100" y2="0" stroke="black"></line>
               <g className="entities">
                 <g className="edges">
                   {
