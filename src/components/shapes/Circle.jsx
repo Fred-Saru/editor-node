@@ -12,7 +12,7 @@ class Circle extends React.Component {
     return (
       <>
         <circle
-          className="circle"
+          className={this.props.className}
           cx={x}
           cy={y}
           r={size}

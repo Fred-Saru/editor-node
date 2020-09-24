@@ -41,8 +41,20 @@ $background-color: #f9f9f9;
         stroke: black;
     }
 
-    .node:hover {
+    .node:hover .contour {
         stroke: $primary-color;
+    }
+
+    .dragged {
+      filter: drop-shadow(10px 10px 5px black);
+    }
+
+    .handle {
+      cursor: pointer;
+    }
+
+    .handle:hover {
+      fill: $primary-color;
     }
 
     .connector {

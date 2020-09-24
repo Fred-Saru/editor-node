@@ -193,6 +193,10 @@ class Graph extends React.Component {
           onMouseMove={this.handleMouseMove}>
           <svg className="graph" viewBox={viewBox} ref={el => this.graph = el}>
             <defs>
+              <filter id="drop-shadow-path-line" filterUnits="userSpaceOnUse" >
+                <feGaussianBlur result="blurOut" in="SourceAlpha" stdDeviation="3" />
+                <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+              </filter>
               <pattern
                 id="grid"
                 width={gridSpacing}

@@ -7,12 +7,36 @@ class Handle extends React.Component {
     y: 0,
     size: 6
   }
+
+  handle;
+
+  handleMouseDown = ( e ) => {
+    e.stopPropagation();
+    this.handle.ownerSVGElement.addEventListener( 'mousemove', this.handleMouseMove );
+  }
+
+  handleMouseUp = ( e ) => {
+    e.stopPropagation();
+    this.handle.ownerSVGElement.removeEventListener( 'mousemove', this.handleMouseMove );
+  }
+
+  handleMouseMove = ( e ) => {
+
+  }
+
   render() {
 
     const { x, y, size } = this.props;
 
     return (
-      <Circle size={size} x={x} y={y}></Circle>
+      <g
+        onMouseDown={this.handleMouseDown}
+        onMouseUp={this.handleMouseUp}
+        ref={el => this.handle = el}>
+        <Circle
+          size={size} x={x} y={y}
+          className='handle'></Circle>
+      </g>
     );
   }
 }

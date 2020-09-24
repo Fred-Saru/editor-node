@@ -26,7 +26,8 @@ class Node extends React.Component {
       dx: 0,
       dy: 0,
       x: props.node.pos.x,
-      y: props.node.pos.y
+      y: props.node.pos.y,
+      blockClick: false
     };
   }
 
@@ -41,7 +42,6 @@ class Node extends React.Component {
 
   handleMouseEnter = ( e ) => {
     e.stopPropagation();
-    if ( this.state.isDrawingEdge ) return;
 
     const { id } = this.props.node;
     this.props.hoverNode( id );
@@ -50,29 +50,24 @@ class Node extends React.Component {
   handleMouseLeave = ( e ) => {
     e.stopPropagation();
 
-    if ( this.state.isDrawingEdge ) return;
-
     this.props.hoverNode( null );
   }
 
   handleClick = ( e ) => {
     e.stopPropagation();
 
-    const { id } = this.props.node;
-    this.props.selectNode( id )
+    if ( !this.state.blockClick ) {
+      const { id } = this.props.node;
+      this.props.selectNode( id )
+    }
+
+    this.setState( {
+      blockClick: false
+    } );
   }
 
   handleMouseDown = ( e ) => {
     e.stopPropagation();
-
-    if ( e.shiftKey ) {
-      this.setState( {
-        sourceId: this.props.node.id,
-        isDrawingEdge: true,
-      } );
-      this.props.hoverNode( null );
-      return;
-    }
 
     const offset = this.getMousePosition( e );
 
@@ -107,19 +102,13 @@ class Node extends React.Component {
 
     const coord = this.getMousePosition( e );
 
-    if ( this.state.isDrawingEdge ) {
-      this.setState( {
-        mousePos: { x: coord.x, y: coord.y }
-      } );
-      return;
-    }
-
     if ( this.state.isDragging ) {
       const { pos } = this.props.node;
 
       this.setState( {
         x: pos.x + coord.x - this.state.dx,
-        y: pos.y + coord.y - this.state.dy
+        y: pos.y + coord.y - this.state.dy,
+        blockClick: true
       } );
     }
   }
@@ -151,20 +140,21 @@ class Node extends React.Component {
           x={x} y={y}
           width={size}
           height={size}
-          viewBox={`-1 -1 ${size + 2} ${size + 2}`}
+          viewBox={`-5 -5 ${size + 10} ${size + 10}`}
           className={`node ${this.props.selectedNodeId === nodeId ? 'selected' : ''}`}
           onMouseEnter={this.handleMouseEnter}
           onMouseLeave={this.handleMouseLeave}
+          onClick={this.handleClick}
           onMouseDown={this.handleMouseDown}
           onMouseUp={this.handleMouseUp}
-          onClick={this.handleClick}
           pointerEvents='all'>
-          <Rect width={size} height={size} x={0} y={0} rx={rx} ry={ry}>
+          <Rect width={size} height={size} x={0} y={0} rx={rx} ry={ry}
+            className={`contour`} filter={`${this.state.isDragging ? 'url(#drop-shadow-path-line)' : ''}`}>
             <svg x={0} y={0}>
               <Text y={10} x={size / 2}>Title</Text>
-              <Line start={{ x: 0, y: 18 }} end={{ x: size, y: 18 }}></Line>
+              <Line start={{ x: 0, y: 20 }} end={{ x: size, y: 20 }}></Line>
             </svg>
-            <svg x={0} y={18} width={size} height={size - 18} viewBox={`0 0 ${size} ${size}`} preserveAspectRatio="xMidYMid meet">
+            <svg x={0} y={20} width={size} height={size - 20} viewBox={`0 0 ${size} ${size}`} preserveAspectRatio="xMidYMid meet">
               {this.renderNode()}
             </svg>
           </Rect>

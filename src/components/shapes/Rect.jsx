@@ -18,7 +18,9 @@ class Rect extends React.Component {
           height={height}
           fill={fill}
           rx={rx}
-          ry={ry}></rect>
+          ry={ry}
+          className={this.props.className}
+          filter={this.props.filter}></rect>
         {this.props.children}
       </>
     );
