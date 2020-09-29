@@ -1,15 +1,19 @@
 body {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+}
+
+svg {
+  overflow: visible;
 }
 
 #root {
-    width: 100vw;
-    height: 100vh;
+  width: 100vw;
+  height: 100vh;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 $primary-color: dodgerblue;
@@ -19,71 +23,71 @@ $light-grey: lightgrey;
 $background-color: #f9f9f9;
 
 .graph-wrapper {
-    height: 100%;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  background: #f9f9f9;
+  font-family: monospace;
+
+  >.graph {
     width: 100%;
-    margin: 0;
-    display: flex;
-    background: #f9f9f9;
-    font-family: monospace;
+    height: 100%;
+  }
 
-    >.graph {
-        width: 100%;
-        height: 100%;
-    }
+  .bg-pattern {
+    fill: $light-grey;
+  }
 
-    .bg-pattern {
-        fill: $light-grey;
-    }
+  .node {
+    fill: white;
+    stroke-width: 1px;
+    stroke: black;
+  }
 
-    .node {
-        fill: white;
-        stroke-width: 1px;
-        stroke: black;
-    }
+  .node:hover .contour {
+    stroke: $primary-color;
+  }
 
-    .node:hover .contour {
-        stroke: $primary-color;
-    }
+  .dragged {
+    filter: drop-shadow(10px 10px 5px black);
+  }
 
-    .dragged {
-      filter: drop-shadow(10px 10px 5px black);
-    }
+  .handle {
+    cursor: pointer;
+  }
 
-    .handle {
-      cursor: pointer;
-    }
+  .handle:hover {
+    fill: $primary-color;
+  }
 
-    .handle:hover {
-      fill: $primary-color;
-    }
+  .connector {
+    fill: 'black';
+  }
 
-    .connector {
-      fill: 'black';
-    }
+  .connector:hover {
+    fill: $primary-color;
+  }
 
-    .connector:hover {
-      fill: $primary-color;
-    }
-
-    .node.selected {
-        fill: $primary-color;
-        stroke: black;
-    }
+  .node.selected {
+    fill: $primary-color;
+    stroke: black;
+  }
 
 
 }
 
 .drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
+  position: fixed;
+  top: 0;
+  right: 0;
 
-    max-width: 400px;
-    min-width: 250px;
-    width: 20%;
+  max-width: 400px;
+  min-width: 250px;
+  width: 20%;
 
-    height: 100%;
+  height: 100%;
 
-    background-color: white;
-    border-left: 1px solid $light-grey;
+  background-color: white;
+  border-left: 1px solid $light-grey;
 }
