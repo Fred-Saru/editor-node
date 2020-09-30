@@ -58,7 +58,7 @@ class Graph extends React.Component {
     e.stopPropagation();
     const scale = this.state.scale + e.deltaY * -0.001;
     this.setState( {
-      scale: Math.min( 2, Math.max( 0.5, scale ) )
+      scale: Math.min( 1, Math.max( 0.25, scale ) )
     } );
   }
 
@@ -184,14 +184,14 @@ class Graph extends React.Component {
 
     return (
       <>
-        {/* <div > */}
-        <svg className="graph-wrapper" ref={el => this.graphWrapper = el}
-          onMouseDown={this.handleMouseDown}
-          onMouseUp={this.handleMouseUp}
-          onClick={this.handleMouseClick}
-          onWheel={this.handleMouseWheel}
-          onMouseMove={this.handleMouseMove}>
-          <svg className="graph" viewBox={viewBox} ref={el => this.graph = el}>
+        {/* <div > */ }
+        <svg className="graph-wrapper" ref={ el => this.graphWrapper = el }
+          onMouseDown={ this.handleMouseDown }
+          onMouseUp={ this.handleMouseUp }
+          onClick={ this.handleMouseClick }
+          onWheel={ this.handleMouseWheel }
+          onMouseMove={ this.handleMouseMove }>
+          <svg className="graph" viewBox={ viewBox } ref={ el => this.graph = el }>
             <defs>
               <filter id="drop-shadow-path-line" filterUnits="userSpaceOnUse" >
                 <feGaussianBlur result="blurOut" in="SourceAlpha" stdDeviation="3" />
@@ -199,8 +199,8 @@ class Graph extends React.Component {
               </filter>
               <pattern
                 id="grid"
-                width={gridSpacing}
-                height={gridSpacing}
+                width={ gridSpacing }
+                height={ gridSpacing }
                 patternUnits="userSpaceOnUse"
               >
                 <circle
@@ -213,22 +213,22 @@ class Graph extends React.Component {
             </defs>
             <g
               className="view"
-              ref={el => this.backgroundWrapper = el}>
+              ref={ el => this.backgroundWrapper = el }>
               <rect
                 className="background"
-                x={-( gridSize || 0 ) / 4}
-                y={-( gridSize || 0 ) / 4}
-                width={gridSize}
-                height={gridSize}
-                fill={`url(${backgroundFillId || ''})`}
+                x={ -( gridSize || 0 ) / 4 }
+                y={ -( gridSize || 0 ) / 4 }
+                width={ gridSize }
+                height={ gridSize }
+                fill={ `url(${ backgroundFillId || '' })` }
               ></rect>
               <g className="entities">
                 <g className="edges">
                   {
                     this.props.allLinkIds.map( key => {
-                      const link = this.props.links[key];
+                      const link = this.props.links[ key ];
                       return (
-                        <Edge edge={link} key={key}>
+                        <Edge edge={ link } key={ key }>
                         </Edge>
                       );
                     } )
@@ -237,9 +237,9 @@ class Graph extends React.Component {
                 <g className="nodes">
                   {
                     this.props.allNodeIds.map( key => {
-                      const node = this.props.nodes[key];
+                      const node = this.props.nodes[ key ];
                       return (
-                        <Node node={node} key={key}>
+                        <Node node={ node } key={ key }>
                         </Node>
                       );
                     } )
@@ -248,14 +248,14 @@ class Graph extends React.Component {
               </g>
             </g>
           </svg>
-          <text x={50} y={660}>{`X: ${this.state.mouseX}, Y: ${this.state.mouseY}`}</text>
+          <text x={ 50 } y={ 660 }>{ `X: ${ this.state.mouseX }, Y: ${ this.state.mouseY }` }</text>
         </svg>
-        {/* </div> */}
+        {/* </div> */ }
         <div className="drawer">
-          <button onClick={() => this.addOperator()}>Add Operator</button>
-          <button onClick={() => this.addConstant()}>Add Constant</button>
-          <button onClick={() => this.addDisplay()}>Add Equal</button>
-          <button onClick={this.resetDisplay}>Reset</button>
+          <button onClick={ () => this.addOperator() }>Add Operator</button>
+          <button onClick={ () => this.addConstant() }>Add Constant</button>
+          <button onClick={ () => this.addDisplay() }>Add Equal</button>
+          <button onClick={ this.resetDisplay }>Reset</button>
         </div>
       </>
     );

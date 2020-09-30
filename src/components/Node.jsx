@@ -17,7 +17,7 @@ class Node extends React.Component {
     ry: 5
   };
 
-  node;
+  nodeEl;
 
   constructor( props ) {
     super( props );
@@ -33,7 +33,7 @@ class Node extends React.Component {
 
 
   getMousePosition = ( e ) => {
-    const screenCTM = this.node.ownerSVGElement.getScreenCTM();
+    const screenCTM = this.nodeEl.ownerSVGElement.getScreenCTM();
     return {
       x: ( e.clientX - screenCTM.e ) / screenCTM.a,
       y: ( e.clientY - screenCTM.f ) / screenCTM.d
@@ -77,7 +77,7 @@ class Node extends React.Component {
       isDragging: true
     } );
 
-    this.node.ownerSVGElement.addEventListener( 'mousemove', this.handleMouseMove );
+    this.nodeEl.ownerSVGElement.addEventListener( 'mousemove', this.handleMouseMove );
   }
 
   handleMouseUp = ( e ) => {
@@ -93,7 +93,7 @@ class Node extends React.Component {
       } );
 
       this.props.moveNode( id, { x, y } );
-      this.node.ownerSVGElement.removeEventListener( 'mousemove', this.handleMouseMove );
+      this.nodeEl.ownerSVGElement.removeEventListener( 'mousemove', this.handleMouseMove );
     }
   }
 
@@ -118,11 +118,11 @@ class Node extends React.Component {
 
     switch ( node.type ) {
       case 'operator':
-        return <Operator node={node} size={size}></Operator>
+        return <Operator node={ node } size={ size }></Operator>
       case 'const':
-        return <Value node={node} size={size}></Value>
+        return <Value node={ node } size={ size }></Value>
       case 'display':
-        return <Equals node={node} size={size}></Equals>
+        return <Equals node={ node } size={ size }></Equals>
       default:
         return null;
     }
@@ -136,26 +136,29 @@ class Node extends React.Component {
       <g
         className='node-wrapper'>
         <svg
-          ref={el => this.node = el}
-          x={x} y={y}
-          width={size}
-          height={size}
-          viewBox={`-5 -5 ${size + 10} ${size + 10}`}
-          className={`node ${this.props.selectedNodeId === nodeId ? 'selected' : ''}`}
-          onMouseEnter={this.handleMouseEnter}
-          onMouseLeave={this.handleMouseLeave}
-          onClick={this.handleClick}
-          onMouseDown={this.handleMouseDown}
-          onMouseUp={this.handleMouseUp}
+          ref={ el => this.nodeEl = el }
+          x={ x } y={ y }
+          width={ size }
+          height={ size }
+          viewBox={ `-5 -5 ${ size + 10 } ${ size + 10 }` }
+          className={ `node ${ this.props.selectedNodeId === nodeId ? 'selected' : '' }` }
+          onMouseEnter={ this.handleMouseEnter }
+          onMouseLeave={ this.handleMouseLeave }
+          onClick={ this.handleClick }
+          onMouseDown={ this.handleMouseDown }
+          onMouseUp={ this.handleMouseUp }
           pointerEvents='all'>
-          <Rect width={size} height={size} x={0} y={0} rx={rx} ry={ry}
-            className={`contour`} filter={`${this.state.isDragging ? 'url(#drop-shadow-path-line)' : ''}`}>
-            <svg x={0} y={0}>
-              <Text y={10} x={size / 2}>Title</Text>
-              <Line start={{ x: 0, y: 20 }} end={{ x: size, y: 20 }}></Line>
+          <Rect width={ size } height={ size } x={ 0 } y={ 0 } rx={ rx } ry={ ry }
+            className={ `contour` } filter={ `${ this.state.isDragging ? 'url(#drop-shadow-path-line)' : '' }` }>
+            <svg x={ 0 } y={ 0 }>
+              <Text y={ 10 } x={ size / 2 }>Title</Text>
+              <Line
+                start={ { x: 0, y: 20 } }
+                end={ { x: size, y: 20 } }
+                className='contour'></Line>
             </svg>
-            <svg x={0} y={20} width={size} height={size - 20} viewBox={`0 0 ${size} ${size}`} preserveAspectRatio="xMidYMid meet">
-              {this.renderNode()}
+            <svg x={ 0 } y={ 20 } width={ size } height={ size - 20 } viewBox={ `0 0 ${ size } ${ size }` } preserveAspectRatio="xMidYMid meet">
+              { this.renderNode() }
             </svg>
           </Rect>
         </svg>
