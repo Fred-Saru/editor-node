@@ -11,7 +11,7 @@ class Text extends React.Component {
     const { x, y } = this.props;
 
     return (
-      <text textAnchor="middle" alignmentBaseline="middle" x={x} y={y}>{this.props.children}</text>
+      <text className='text' textAnchor="middle" alignmentBaseline="middle" x={x} y={y}>{this.props.children}</text>
     );
   }
 }

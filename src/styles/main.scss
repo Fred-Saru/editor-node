@@ -73,6 +73,10 @@ $background-color: #f9f9f9;
 
 }
 
+.text {
+  pointer-events: none;
+}
+
 .drawer {
     position: fixed;
     top: 0;
